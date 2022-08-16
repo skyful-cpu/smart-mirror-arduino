@@ -1,11 +1,19 @@
 #include <SoftwareSerial.h>
+#include <Adafruit_NeoPixel.h>
 
 // hc06 모듈의 RX / TX가 연결된 핀
 unsigned const int rx_pin = 2;
 unsigned const int tx_pin = 3;
 
+// NeoPixel 관련 변수
+unsigned const int neoPin = 8;
+unsigned const int numOfNeo = 10;
+
+// NeoPixel 객체 생성
+Adafruit_NeoPixel neoPixel = Adafruit_NeoPixel(numOfNeo, numOfNeo, NEO_GRBW + NEO_KHZ800);
+
 // IoT 관련 변수
-char* iot[] = {"light", "boiler", "fan"}; // IoT 종류
+char* iot[] = {"light", "boiler", "fan", "window", "cutain", "valve"}; // IoT 종류
 int iot_pin[] = {8, 9, 10, 11, 12, 13}; // IoT가 연결된 핀
 // int switch_pin[] = {11, 12, 13}; // 스위치가 연결된 핀
 int iot_init_state[] = {1, 1, 1, 1, 1, 1}; // (임시) IoT 초기 상태
@@ -27,6 +35,9 @@ void setup() {
   // Serial / hc06 설정
   Serial.begin(9600);
   hc06.begin(9600);
+
+  // NeoPixel 사용
+  neoPixel.begin();
 }
 
 void loop() {
@@ -54,10 +65,18 @@ void ControlIot(int cmd) {
   if (cmd == 'i')
     SendInitState();
   else if (cmd == '1') {
-    digitalWrite(iot_pin[0], HIGH);
+    // digitalWrite(iot_pin[0], HIGH);
+    // NeoPixel 켜기
+    for (int i = 0; i < numOfNeo; i++) {
+      neoPixel.setPixelColor(i, 0, 0, 0, 127);
+    }
+    neoPixel.show();
   }
   else if (cmd == '0') {
-    digitalWrite(iot_pin[0], LOW);
+    // digitalWrite(iot_pin[0], LOW);
+    // NeoPixel 끄기
+    neoPixel.clear();
+    neoPixel.show();
   }
   else if (cmd == '3') {
     digitalWrite(iot_pin[1], HIGH);
